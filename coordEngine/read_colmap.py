@@ -50,7 +50,7 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
             continue
 
         # image = copy.deepcopy(Image.open(image_path))
-        cam_info = visAnyCamera(R_c2w=R_c2w, K=K, FovY=FovY, FovX=FovX,
+        cam_info = visAnyCamera(P_c2w=P_c2w, K=K, FovY=FovY, FovX=FovX,
                               image_path=image_path, image_name=image_name, width=width, height=height)
         all_cams.add_camera(cam_info)
     sys.stdout.write('\n')
@@ -82,7 +82,7 @@ def read_colmap(colmap_path, from_json=False, images='images'):
 
 if __name__ == "__main__":
     colmap_path = 'colmap_cam_demo/images_4_sample_x1/exhaustive'
-    # colmap_path = '../colmap_cam_demo/images_4_sample_x1/exhaustive'
+    colmap_path = 'D:\server\home\songgaochao\codes\gof_a6k\datasets\TNT_GOF\TrainingSet\Barn'
     all_cams = read_colmap(colmap_path=colmap_path)
     print(f'read colmap cameras, number : {len(all_cams)}')
-    # all_cams.save_to_json(target_path=colmap_path)
+    all_cams.save_to_json(target_path=colmap_path)

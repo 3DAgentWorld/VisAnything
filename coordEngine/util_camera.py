@@ -6,10 +6,10 @@ import os
 
 
 class visAnyCamera(NamedTuple):
-    R_c2w: np.array  # 4x4
+    P_c2w: np.array  # 4x4
     K: np.array  # 3x3
-    FovY: np.float  # radian
-    FovX: np.float  # radian
+    FovY: np.array  # radian
+    FovX: np.array  # radian
     image_path: str
     image_name: str  # without .png/.jpg
     width: int
@@ -17,7 +17,7 @@ class visAnyCamera(NamedTuple):
 
     def to_dict(self):
         return {
-            'R_c2w': self.R_c2w.tolist(),
+            'P_c2w': self.P_c2w.tolist(),
             'K': self.K.tolist(),
             'FovX': self.FovX,
             'FovY': self.FovY,
@@ -30,7 +30,7 @@ class visAnyCamera(NamedTuple):
 
 def dic_to_camera(camera_dic):
     return visAnyCamera(
-        R_c2w=np.array(camera_dic['R_c2w']),
+        P_c2w=np.array(camera_dic['P_c2w']),
         K=np.array(camera_dic['K']),
         FovX=np.array(camera_dic['FovX']),
         FovY=np.array(camera_dic['FovY']),
@@ -66,7 +66,7 @@ class visAnyCameraList():
     def trans_cv_2_gl(self):
         if self.coordsys == 'cv':
             for camera in self.all_camera_list:
-                camera.R_c2w = util_trans.cv_2_gl(camera.R_c2w)
+                camera.P_c2w = cv_2_gl(camera.P_c2w)
         else:
             raise Exception('current camera system is not cv')
         self.coordsys = 'gl'
@@ -74,7 +74,7 @@ class visAnyCameraList():
     def trans_gl_2_cv(self):
         if self.coordsys == 'gl':
             for camera in self.all_camera_list:
-                camera.R_c2w = util_trans.gl_2_cv(camera.R_c2w)
+                camera.P_c2w = gl_2_cv(camera.P_c2w)
         else:
             raise Exception('current camera system is not gl')
         self.coordsys = 'cv'
