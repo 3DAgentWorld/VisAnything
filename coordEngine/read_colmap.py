@@ -4,7 +4,6 @@ from util_camera import visAnyCameraList, visAnyCamera
 from util_trans import *
 
 
-
 def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
     all_cams = visAnyCameraList()
     for idx, key in enumerate(cam_extrinsics):
@@ -51,7 +50,7 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
 
         # image = copy.deepcopy(Image.open(image_path))
         cam_info = visAnyCamera(P_c2w=P_c2w, K=K, FovY=FovY, FovX=FovX,
-                              image_path=image_path, image_name=image_name, width=width, height=height)
+                                image_path=image_path, image_name=image_name, width=width, height=height)
         all_cams.add_camera(cam_info)
     sys.stdout.write('\n')
     return all_cams
@@ -75,14 +74,18 @@ def read_colmap(colmap_path, from_json=False, images='images'):
         cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
     all_cams = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics,
-                                          images_folder=os.path.join(colmap_path, images))
+                                 images_folder=os.path.join(colmap_path, images))
     all_cams.sort_cam()
+    # set sparse point cloud
+    colmap_bin2ply(colmap_path)
+    sparse_pc_path = os.path.join(colmap_path, "sparse/0/points3D.ply")
+    all_cams.set_sparse_pc_path(sparse_pc_path)
     return all_cams
 
 
 if __name__ == "__main__":
     colmap_path = 'colmap_cam_demo/images_4_sample_x1/exhaustive'
-    colmap_path = 'D:\server\home\songgaochao\codes\gof_a6k\datasets\TNT_GOF\TrainingSet\Barn'
+    # colmap_path = 'D:\server\home\songgaochao\codes\gof_a6k\datasets\TNT_GOF\TrainingSet\Barn'
     all_cams = read_colmap(colmap_path=colmap_path)
     print(f'read colmap cameras, number : {len(all_cams)}')
     all_cams.save_to_json(target_path=colmap_path)

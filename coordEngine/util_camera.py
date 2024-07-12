@@ -45,10 +45,14 @@ class visAnyCameraList():
     def __init__(self, coordsys='cv'):
         self.all_camera_list = []
         self.coordsys = coordsys
+        self.sparse_pc_path = ''
         print(f'init visAnyCameraList, system is {self.coordsys}')
 
     def __len__(self):
         return len(self.all_camera_list)
+
+    def set_sparse_pc_path(self, pc_path):
+        self.sparse_pc_path = pc_path
 
     def get_camera_list(self):
         return self.all_camera_list

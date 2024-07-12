@@ -10,6 +10,28 @@ class BasicPointCloud(NamedTuple):
     colors: np.array
     normals: np.array
 
+def SH2RGB(sh):
+    C0 = 0.28209479177387814
+    return sh * C0 + 0.5
+
+def generate_random_pc(ply_path, num_pts=100_000):
+    if not os.path.exists(ply_path):
+        print(f"Generating random point cloud ({num_pts})...")
+        # We create random points inside the bounds of the synthetic Blender scenes
+        xyz = np.random.random((num_pts, 3)) * 2.6 - 1.3
+        shs = np.random.random((num_pts, 3)) / 255.0
+        pcd = BasicPointCloud(points=xyz, colors=SH2RGB(shs), normals=np.zeros((num_pts, 3)))
+
+        storePly(ply_path, xyz, SH2RGB(shs) * 255)
+
+    try:
+        pcd = fetchPly(ply_path)
+    except:
+        pcd = None
+        print('pcd is None')
+
+    return pcd
+
 
 def fetchPly(path):
     plydata = PlyData.read(path)
