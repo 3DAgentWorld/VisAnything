@@ -84,7 +84,7 @@ def read_colmap(colmap_path, from_json=False, images='images'):
 
 
 if __name__ == "__main__":
-    colmap_path = 'colmap_cam_demo/images_4_sample_x1/exhaustive'
+    colmap_path = 'colmap_cam_demo/waymo_10061/exhaustive'
     # colmap_path = 'D:\server\home\songgaochao\codes\gof_a6k\datasets\TNT_GOF\TrainingSet\Barn'
     all_cams = read_colmap(colmap_path=colmap_path)
     print(f'read colmap cameras, number : {len(all_cams)}')

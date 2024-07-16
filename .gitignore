@@ -1,2 +1,7 @@
 colmap_cam_demo
 nerf_cam_demo
+waymo_cam_demo
+coordEngine/__pycache__
+visEngine/__pycache__
+__pycache__
+visEngine/ace/ace_output
