@@ -10,6 +10,9 @@ class BasicPointCloud(NamedTuple):
     colors: np.array
     normals: np.array
 
+def save_basicpcd(pcd: BasicPointCloud, ply_path):
+    storePly(ply_path, pcd.points, pcd.colors*255, pcd.normals)
+
 def SH2RGB(sh):
     C0 = 0.28209479177387814
     return sh * C0 + 0.5
@@ -85,13 +88,14 @@ def read_points3D_binary(path_to_model_file):
     return xyzs, rgbs, errors
 
 
-def storePly(path, xyz, rgb):
+def storePly(path, xyz, rgb, normals=None):
     # Define the dtype for the structured array
     dtype = [('x', 'f4'), ('y', 'f4'), ('z', 'f4'),
              ('nx', 'f4'), ('ny', 'f4'), ('nz', 'f4'),
              ('red', 'u1'), ('green', 'u1'), ('blue', 'u1')]
 
-    normals = np.zeros_like(xyz)
+    if normals is None:
+        normals = np.zeros_like(xyz)
 
     elements = np.empty(xyz.shape[0], dtype=dtype)
     attributes = np.concatenate((xyz, normals, rgb), axis=1)

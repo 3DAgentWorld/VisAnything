@@ -1,7 +1,7 @@
-from colmap_utils import *
+from coordEngine.colmap_utils import *
 import sys
-from util_camera import visAnyCameraList, visAnyCamera
-from util_trans import *
+from coordEngine.util_camera import visAnyCameraList, visAnyCamera
+from coordEngine.util_trans import *
 
 
 def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
@@ -83,9 +83,3 @@ def read_colmap(colmap_path, from_json=False, images='images'):
     return all_cams
 
 
-if __name__ == "__main__":
-    colmap_path = 'colmap_cam_demo/waymo_10061/exhaustive'
-    # colmap_path = 'D:\server\home\songgaochao\codes\gof_a6k\datasets\TNT_GOF\TrainingSet\Barn'
-    all_cams = read_colmap(colmap_path=colmap_path)
-    print(f'read colmap cameras, number : {len(all_cams)}')
-    all_cams.save_to_json(target_path=colmap_path)

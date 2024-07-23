@@ -3,6 +3,19 @@
 - run the scripts in **blender environment**!
 - read opencv camera (.json), opencv mesh (.ply) and auto transform to blender system!
 
+# Environment of blender python
+- It is not convenient for installing bpy in conda environment; So we have to install python 
+packages in blender python environment, like the following command:
+```
+"D:\Program Files\Blender Foundation\Blender 3.4\3.4\python\bin\python.exe" -m ensurepip
+"D:\Program Files\Blender Foundation\Blender 3.4\3.4\python\bin\python.exe" -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+- How to import ply in different version ?
+```
+< version 4.0: bpy.ops.import_mesh.ply(filepath=ply_file_path)
+> version 4.0: bpy.ops.wm.ply_import(filepath='/path/to.ply') # using c++, so very fast
+```
+
 # usage
 
 ### 1. debug camera

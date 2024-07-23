@@ -1,12 +1,10 @@
-import sys
-from util_camera import visAnyCameraList, visAnyCamera
-from util_trans import *
+from coordEngine.util_trans import *
 import os
 import json
 from pathlib import Path
 from PIL import Image
-from util_camera import visAnyCameraList, visAnyCamera
-import colmap_utils
+from coordEngine.util_camera import visAnyCameraList, visAnyCamera
+from coordEngine import colmap_utils
 
 
 def readNerfSynCameras(path, transformsfile, white_background, extension=".png"):
@@ -83,10 +81,3 @@ def read_nerf_syn(nerf_syn_path, white_background=False, add_test=False, extensi
         train_cams.sparse_pc_path = ply_path
 
     return train_cams
-
-
-if __name__ == "__main__":
-    nerf_syn_path = 'nerf_cam_demo/nerf_synthetic/nerf_synthetic/chair'
-    all_cams = read_nerf_syn(nerf_syn_path=nerf_syn_path)
-    print(f'read nerf syn cameras, number : {len(all_cams)}')
-    all_cams.save_to_json(target_path=nerf_syn_path)

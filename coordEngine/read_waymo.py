@@ -3,8 +3,8 @@ import pickle
 import sys
 import shutil
 import numpy as np
-from util_camera import visAnyCameraList, visAnyCamera
-from util_trans import *
+from coordEngine.util_camera import visAnyCameraList, visAnyCamera
+from coordEngine.util_trans import *
 from pathlib import Path
 
 
@@ -117,9 +117,3 @@ def merge_save_waymo(dataset_folder, start_end=None):
                     shutil.copy(source_path, destination_path)
     return os.path.dirname(destination_folder)
 
-
-if __name__ == "__main__":
-    waymo_path = 'waymo_cam_demo/individual_files_training_segment-10061305430875486848_1080_000_1100_000_with_camera_labels'
-    all_cams = read_waymo(waymo_path=waymo_path)
-    print(f'read colmap cameras, number : {len(all_cams)}')
-    all_cams.save_to_json(target_path=waymo_path)

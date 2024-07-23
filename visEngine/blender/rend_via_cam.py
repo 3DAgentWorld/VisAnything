@@ -104,7 +104,8 @@ def render_ply_with_cameras(json_file_path, ply_file_path, output_dir):
 
     # 导入 PLY 文件
     print('importing ply ...')
-    bpy.ops.import_mesh.ply(filepath=ply_file_path)
+    # bpy.ops.import_mesh.ply(filepath=ply_file_path) # for blender < 4.0
+    bpy.ops.wm.ply_import(filepath=ply_file_path) # for blender > 4.0, using c++
     ply_object = bpy.context.selected_objects[0]
 
     # to transform opencv coord to blender
