@@ -63,8 +63,9 @@ def create_camera(camera_info):
     camera.matrix_world = transform_matrix
 
     # 设置摄像机的视场角（直接使用弧度）
+    camera.data.angle_y = camera_info['FovY'] # actually this line is useless
     camera.data.angle_x = camera_info['FovX']
-    camera.data.angle_y = camera_info['FovY']
+
 
     # 设置分辨率
     bpy.context.scene.render.resolution_x = camera_info['width']

@@ -5,17 +5,49 @@ from plyfile import PlyData, PlyElement
 from typing import NamedTuple
 import collections
 
+
 class BasicPointCloud(NamedTuple):
     points: np.array
     colors: np.array
     normals: np.array
 
-def save_basicpcd(pcd: BasicPointCloud, ply_path):
-    storePly(ply_path, pcd.points, pcd.colors*255, pcd.normals)
+
+def increase_pcd(pcd0: BasicPointCloud, pcd1: BasicPointCloud):
+    points0 = pcd0.points
+    colors0 = pcd0.colors
+    normals0 = pcd0.normals
+    points1 = pcd1.points
+    colors1 = pcd1.colors
+    normals1 = pcd1.normals
+    points = np.vstack([points0, points1])
+    colors = np.vstack([colors0, colors1])
+    normals = np.vstack([normals0, normals1])
+    return BasicPointCloud(points, colors, normals)
+
+
+def pcd_cv_2_blender(pcd: BasicPointCloud):
+    points = pcd.points
+    colors = pcd.colors
+    normals = pcd.normals
+    points[:, 1] = -points[:, 1]
+    points[:, 2] = -points[:, 2]
+    normals[:, 1] = -normals[:, 1]
+    normals[:, 2] = -normals[:, 2]
+    return BasicPointCloud(points, colors, normals)
+
+
+def save_basicpcd(pcd: BasicPointCloud, ply_path, to_blender=False):
+    if to_blender:
+        pcd = pcd_cv_2_blender(pcd)
+        base_path = ply_path.split('.')[-2]
+        ply_path = f'{base_path}_blender.ply'
+    storePly(ply_path, pcd.points, pcd.colors * 255, pcd.normals)
+
 
 def SH2RGB(sh):
     C0 = 0.28209479177387814
     return sh * C0 + 0.5
+
 
 def generate_random_pc(ply_path, num_pts=100_000):
     if not os.path.exists(ply_path):
@@ -145,15 +177,16 @@ CAMERA_MODEL_NAMES = dict([(camera_model.model_name, camera_model)
 
 def qvec2rotmat(qvec):
     return np.array([
-        [1 - 2 * qvec[2]**2 - 2 * qvec[3]**2,
+        [1 - 2 * qvec[2] ** 2 - 2 * qvec[3] ** 2,
          2 * qvec[1] * qvec[2] - 2 * qvec[0] * qvec[3],
          2 * qvec[3] * qvec[1] + 2 * qvec[0] * qvec[2]],
         [2 * qvec[1] * qvec[2] + 2 * qvec[0] * qvec[3],
-         1 - 2 * qvec[1]**2 - 2 * qvec[3]**2,
+         1 - 2 * qvec[1] ** 2 - 2 * qvec[3] ** 2,
          2 * qvec[2] * qvec[3] - 2 * qvec[0] * qvec[1]],
         [2 * qvec[3] * qvec[1] - 2 * qvec[0] * qvec[2],
          2 * qvec[2] * qvec[3] + 2 * qvec[0] * qvec[1],
-         1 - 2 * qvec[1]**2 - 2 * qvec[2]**2]])
+         1 - 2 * qvec[1] ** 2 - 2 * qvec[2] ** 2]])
+
 
 def rotmat2qvec(R):
     Rxx, Ryx, Rzx, Rxy, Ryy, Rzy, Rxz, Ryz, Rzz = R.flat
@@ -168,9 +201,11 @@ def rotmat2qvec(R):
         qvec *= -1
     return qvec
 
+
 class Image(BaseImage):
     def qvec2rotmat(self):
         return qvec2rotmat(self.qvec)
+
 
 def read_next_bytes(fid, num_bytes, format_char_sequence, endian_character="<"):
     """Read and unpack the next bytes from a binary file.
@@ -182,6 +217,7 @@ def read_next_bytes(fid, num_bytes, format_char_sequence, endian_character="<"):
     """
     data = fid.read(num_bytes)
     return struct.unpack(endian_character + format_char_sequence, data)
+
 
 def read_points3D_text(path):
     """
@@ -201,7 +237,6 @@ def read_points3D_text(path):
             line = line.strip()
             if len(line) > 0 and line[0] != "#":
                 num_points += 1
-
 
     xyzs = np.empty((num_points, 3))
     rgbs = np.empty((num_points, 3))
@@ -225,13 +260,13 @@ def read_points3D_text(path):
 
     return xyzs, rgbs, errors
 
+
 def read_points3D_binary(path_to_model_file):
     """
     see: src/base/reconstruction.cc
         void Reconstruction::ReadPoints3DBinary(const std::string& path)
         void Reconstruction::WritePoints3DBinary(const std::string& path)
     """
-
 
     with open(path_to_model_file, "rb") as fid:
         num_points = read_next_bytes(fid, 8, "Q")[0]
@@ -249,12 +284,13 @@ def read_points3D_binary(path_to_model_file):
             track_length = read_next_bytes(
                 fid, num_bytes=8, format_char_sequence="Q")[0]
             track_elems = read_next_bytes(
-                fid, num_bytes=8*track_length,
-                format_char_sequence="ii"*track_length)
+                fid, num_bytes=8 * track_length,
+                format_char_sequence="ii" * track_length)
             xyzs[p_id] = xyz
             rgbs[p_id] = rgb
             errors[p_id] = error
     return xyzs, rgbs, errors
+
 
 def read_intrinsics_text(path):
     """
@@ -280,6 +316,7 @@ def read_intrinsics_text(path):
                                             params=params)
     return cameras
 
+
 def read_extrinsics_binary(path_to_model_file):
     """
     see: src/base/reconstruction.cc
@@ -298,13 +335,13 @@ def read_extrinsics_binary(path_to_model_file):
             camera_id = binary_image_properties[8]
             image_name = ""
             current_char = read_next_bytes(fid, 1, "c")[0]
-            while current_char != b"\x00":   # look for the ASCII 0 entry
+            while current_char != b"\x00":  # look for the ASCII 0 entry
                 image_name += current_char.decode("utf-8")
                 current_char = read_next_bytes(fid, 1, "c")[0]
             num_points2D = read_next_bytes(fid, num_bytes=8,
                                            format_char_sequence="Q")[0]
-            x_y_id_s = read_next_bytes(fid, num_bytes=24*num_points2D,
-                                       format_char_sequence="ddq"*num_points2D)
+            x_y_id_s = read_next_bytes(fid, num_bytes=24 * num_points2D,
+                                       format_char_sequence="ddq" * num_points2D)
             xys = np.column_stack([tuple(map(float, x_y_id_s[0::3])),
                                    tuple(map(float, x_y_id_s[1::3]))])
             point3D_ids = np.array(tuple(map(int, x_y_id_s[2::3])))
@@ -333,8 +370,8 @@ def read_intrinsics_binary(path_to_model_file):
             width = camera_properties[2]
             height = camera_properties[3]
             num_params = CAMERA_MODEL_IDS[model_id].num_params
-            params = read_next_bytes(fid, num_bytes=8*num_params,
-                                     format_char_sequence="d"*num_params)
+            params = read_next_bytes(fid, num_bytes=8 * num_params,
+                                     format_char_sequence="d" * num_params)
             cameras[camera_id] = Camera(id=camera_id,
                                         model=model_name,
                                         width=width,
@@ -395,4 +432,3 @@ def read_colmap_bin_array(path):
         array = np.fromfile(fid, np.float32)
     array = array.reshape((width, height, channels), order="F")
     return np.transpose(array, (1, 0, 2)).squeeze()
-

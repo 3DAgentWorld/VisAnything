@@ -8,6 +8,7 @@ if __name__ == "__main__":
     print(f'read colmap cameras, number : {len(all_cams)}')
     all_cams.save_to_json(target_path=colmap_path)
 
-    depth_pred = camera_trainer.DepthPredictor(all_cams.get_camera_list())
-    depth_pred.generate_one_pcd(idx=0, data_dir=colmap_path)
+    depth_pred = camera_trainer.DepthPredictor(all_cams)
+    # depth_pred.generate_one_pcd(idx=0, data_dir=colmap_path)
+    depth_pred.generate_multi_pcd(frames=[0, 24, 1], data_dir=colmap_path)
 

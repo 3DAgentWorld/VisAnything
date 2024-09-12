@@ -37,3 +37,10 @@ camera name is `camera_info_opencv.json`
 - `FovY`: fov y, calculated from K
 - `image_path`: relative path of image
 - `image_name`: image name without .png/.jpg
+
+# Support free camera movement !!!
+Pipeline:
+1. Import mesh or GS points in blender, and set camera track (see `setCamTrackInBlender.md`)
+2. Run `visEngine/blender/export_cam_track.py`, to export cameras for all frames. These are
+stored in `camera_track_opencv.json`
+3. Read `camera_track_opencv.json` in any project

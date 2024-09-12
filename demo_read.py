@@ -4,7 +4,7 @@ from coordEngine.read_nerf_syn import read_nerf_syn
 
 def colmap_demo():
     # colmap_path = 'colmap_cam_demo/waymo_10061/exhaustive'
-    colmap_path = 'colmap_cam_demo/images_4_sample_x1/exhaustive'
+    colmap_path = 'colmap_cam_demo/garden'
     all_cams = read_colmap(colmap_path=colmap_path)
     print(f'read colmap cameras, number : {len(all_cams)}')
     all_cams.save_to_json(target_path=colmap_path)

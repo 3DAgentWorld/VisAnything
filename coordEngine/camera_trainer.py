@@ -1,7 +1,7 @@
 import os
 
-from kornia.geometry.depth import depth_to_3d, depth_to_normals
-from coordEngine.colmap_utils import BasicPointCloud, save_basicpcd
+from kornia.geometry.depth import depth_to_3d, depth_to_normals, depth_to_3d_v2
+from coordEngine.colmap_utils import BasicPointCloud, save_basicpcd, increase_pcd
 from PIL import Image
 import numpy as np
 import cv2
@@ -14,26 +14,53 @@ torch.hub.help("intel-isl/MiDaS", "DPT_BEiT_L_384", force_reload=True)
 
 class DepthPredictor(object):
 
-    def __init__(self, cam_list, depth_model_type='dpt'):
+    def __init__(self, cam_list_obj, depth_model_type='dpt'):
         self.depth_model_type = depth_model_type  # better: dpt
         self.near = 0.01
 
         self.setup_depth_predictor()
         self.mono_depth = OrderedDict()
         self.mono_pcd = OrderedDict()
-        self.cam_list = cam_list
+        self.cam_list_obj = cam_list_obj
 
-    def generate_one_pcd(self, idx, data_dir=None):
-        cam0 = self.cam_list[idx]
+    def generate_one_pcd(self, idx, data_dir=None, down_sample=False):
+        cam0 = self.cam_list_obj.get_camera_list()[idx]
         image_np = self.read_img_from_path(cam0.image_path)
         depth_tensor = self.predict_depth_from_np(image_np, idx)
-        pcd = self.depth_K_to_pcd(depth_tensor, cam0.K, image_np, idx, cam0.P_c2w)
+        pcd = self.depth_K_to_pcd(depth_tensor, cam0.K, image_np, idx, cam0.P_c2w, down_sample)
+        print(f'pcd {idx:04d}/{len(self.cam_list_obj):04d} done, shape: {pcd.points.shape}')
         if data_dir is not None:
             save_dir = os.path.join(data_dir, 'mono_depth_pcd')
             save_path = os.path.join(save_dir, f'idx{idx:04d}_{cam0.image_name}.ply')
             os.makedirs(save_dir, exist_ok=True)
             save_basicpcd(pcd, save_path)
             print(f'saved .ply to {save_path}')
+        return pcd
+
+    def generate_multi_pcd(self, frames, data_dir=None):
+        self.frames = frames
+        frame_start = frames[0]
+        frame_end = frames[1]
+        frame_gap = frames[2]
+        idx_list = [i for i in range(len(self.cam_list_obj))]
+        idx_list = idx_list[frame_start:frame_end:frame_gap]
+        pcd_start = None
+        for idx in idx_list:
+            next_pcd = self.generate_one_pcd(idx, data_dir=None, down_sample=True)
+            if pcd_start is None:
+                pcd_start = next_pcd
+                continue
+            pcd_start = increase_pcd(pcd_start, next_pcd)
+
+        self.merged_pcd = pcd_start
+        if data_dir is not None:
+            save_dir = os.path.join(data_dir, 'mono_depth_pcd')
+            save_path = os.path.join(save_dir, f'merge_{frame_start:04d}-{frame_end:04d}-{frame_gap:04d}.ply')
+            os.makedirs(save_dir, exist_ok=True)
+            save_basicpcd(pcd_start, save_path, to_blender=True)
+            print(f'saved .ply to {save_path}')
+            self.cam_list_obj.save_frame_to_json(save_dir, frames)
+        return pcd_start
 
     def setup_depth_predictor(self):
         # we recommand to use the following depth models:
@@ -161,6 +188,12 @@ class DepthPredictor(object):
                           normalize_points=False)
 
         points = pts[0].permute(1, 2, 0).cpu().numpy().reshape(-1, 3)
+        # pts = depth_to_3d_v2(depth_tensor[None, None],
+        #                   intr_mat_tensor,
+        #                   normalize_points=False)
+        #
+        # points = pts[0].permute(1, 2, 0).cpu().numpy().reshape(-1, 3)
+
         if P_c2w is not None:
             points = self.points_c2w(points, P_c2w)
             print('transform points from camera to world')

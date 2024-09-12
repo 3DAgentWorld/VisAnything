@@ -101,3 +101,12 @@ class visAnyCameraList():
         with open(target_path, 'w') as f:
             json.dump(dic_list, f, indent=4)
         print(f'successfully saved to {target_path}')
+
+    def save_frame_to_json(self, target_path, frame, target_name='camera_info_opencv.json'):
+        if self.coordsys != 'cv':
+            raise Exception('current system is not cv, can not save')
+        target_path = os.path.join(target_path, f'idx{frame[0]:04d}-{frame[1]:04d}-{frame[2]:04d}_{target_name}')
+        dic_list = self.get_camera_dic_list()[frame[0]:frame[1]:frame[2]]
+        with open(target_path, 'w') as f:
+            json.dump(dic_list, f, indent=4)
+        print(f'successfully saved to {target_path}')

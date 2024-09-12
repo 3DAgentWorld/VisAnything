@@ -12,8 +12,8 @@ packages in blender python environment, like the following command:
 ```
 - How to import ply in different version ?
 ```
-< version 4.0: bpy.ops.import_mesh.ply(filepath=ply_file_path)
-> version 4.0: bpy.ops.wm.ply_import(filepath='/path/to.ply') # using c++, so very fast
+< blender version 4.0: bpy.ops.import_mesh.ply(filepath=ply_file_path)
+> blender version 4.0: bpy.ops.wm.ply_import(filepath='/path/to.ply') # using c++, so very fast
 ```
 
 # usage
@@ -88,3 +88,9 @@ if set video_dir = output_dir, then:
 ------0199/
 --------frames of video 0199.mp4
 ```
+
+### 5. export camera track to json
+- `export_cam_track.py`: Set the camera track previously. Then run this script to export cameras on the
+track based on timeline. For every frame, the script will export one camera pose. All the cameras are
+saved to 'camera_track_opencv.json'
+
