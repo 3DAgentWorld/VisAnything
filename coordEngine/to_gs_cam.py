@@ -25,11 +25,12 @@ class Camera_4dgs(nn.Module):
             print(e)
             print(f"[Warning] Custom device {data_device} failed, fallback to default cuda device" )
             self.data_device = torch.device("cuda")
-        self.original_image = None
+
         # breakpoint()
         # .to(self.data_device)
         self.image_width = image[0]
         self.image_height = image[1]
+        self.original_image = torch.ones((1, self.image_height, self.image_width))
 
         self.gt_alpha_mask = None
 
@@ -70,9 +71,11 @@ class Camera_3dgs(nn.Module):
             print(f"[Warning] Custom device {data_device} failed, fallback to default cuda device")
             self.data_device = torch.device("cuda")
 
-        self.original_image = None
+
         self.image_width = image[0]
         self.image_height = image[1]
+
+        self.original_image = torch.ones((1, self.image_height, self.image_width))
 
 
         self.gt_alpha_mask = None
