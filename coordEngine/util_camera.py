@@ -3,6 +3,7 @@ import numpy as np
 from typing import NamedTuple
 from coordEngine.util_trans import *
 import os
+from coordEngine.to_gs_cam import Camera_3dgs, Camera_4dgs
 
 
 class visAnyCamera(NamedTuple):
@@ -50,6 +51,33 @@ class visAnyCameraList():
 
     def __len__(self):
         return len(self.all_camera_list)
+
+    def __iter__(self):
+        return iter(self.all_camera_list)
+
+    def to_3dgs_cameralist(self):
+        camera_list_3dgs = []
+        for ind, camera in enumerate(self.all_camera_list):
+            R_c2w, T_c2w = get_RT(camera.P_c2w)
+            R_w2c, T_w2c = get_RT(c2w_to_w2c(camera.P_c2w))
+            cam_3dgs = Camera_3dgs(colmap_id=ind, R=R_c2w, T=T_w2c,
+                                   FoVx=camera.FovX, FoVy=camera.FovY,
+                                   image=[camera.width, camera.height], gt_alpha_mask=None,
+                                   image_name=camera.image_name, uid=ind)
+            camera_list_3dgs.append(cam_3dgs)
+        return camera_list_3dgs
+
+    def to_4dgs_cameralist(self):
+        camera_list_4dgs = []
+        for ind, camera in enumerate(self.all_camera_list):
+            R_c2w, T_c2w = get_RT(camera.P_c2w)
+            R_w2c, T_w2c = get_RT(c2w_to_w2c(camera.P_c2w))
+            cam_4dgs = Camera_4dgs(colmap_id=ind, R=R_c2w, T=T_w2c,
+                                   FoVx=camera.FovX, FoVy=camera.FovY,
+                                   image=[camera.width, camera.height], gt_alpha_mask=None,
+                                   image_name=camera.image_name, uid=ind, time=float(ind/len(self.all_camera_list)))
+            camera_list_4dgs.append(cam_4dgs)
+        return camera_list_4dgs
 
     def set_sparse_pc_path(self, pc_path):
         self.sparse_pc_path = pc_path

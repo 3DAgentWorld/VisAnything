@@ -1,8 +1,8 @@
-colmap_cam_demo
-nerf_cam_demo
-waymo_cam_demo
+demos_dataset/colmap_cam_demo
+demos_dataset/nerf_cam_demo
+demos_dataset/waymo_cam_demo
+demos_dataset/mesh_demo
 coordEngine/__pycache__
 visEngine/__pycache__
 __pycache__
 visEngine/ace/ace_output
-mesh_demo

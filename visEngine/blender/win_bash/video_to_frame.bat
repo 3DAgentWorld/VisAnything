@@ -2,10 +2,10 @@
 setlocal enabledelayedexpansion
 
 REM 设置视频文件所在的目录
-set "video_dir=D:\NIPS2024\Blender_videos\NIPS_results\waymo10061"
+set "video_dir=D:\server\home\songgaochao\datasets_a6000\flame_steak\flame_steak"
 
 REM 设置输出图像序列的根目录
-set "output_dir=D:\NIPS2024\Blender_videos\NIPS_results\waymo10061"
+set "output_dir=D:\server\home\songgaochao\datasets_a6000\flame_steak\flame_steak"
 
 REM 切换到视频文件目录
 cd /d "%video_dir%"
@@ -19,7 +19,7 @@ for %%f in (*.mp4) do (
     mkdir "%output_dir%\!filename!"
 
     REM 导出图像序列到对应的文件夹
-    ffmpeg -i "%%f" "%output_dir%\!filename!\frame_%%04d.png"
+    ffmpeg -i "%%f" "%output_dir%\!filename!\images\frame_%%04d.png"
 )
 
 echo 完成！

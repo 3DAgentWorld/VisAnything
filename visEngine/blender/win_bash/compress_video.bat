@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 REM 设置输入和输出文件夹路径
-set "input_folder=D:\NIPS2024\Blender_videos\quwan"
+set "input_folder=D:\server\home\songgaochao\codes\gof_a6k\new_exps\exp_mip360\release\garden\test_track\ours_30000\test_preds_-1"
 set "output_folder=%input_folder%\down"
 
 REM 创建输出文件夹

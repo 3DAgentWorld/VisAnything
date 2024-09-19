@@ -42,8 +42,8 @@ def export_track(output_filename):
             "height": image_height,
             "FovX": angle_x,
             "FovY": angle_y,
-            "image_path": "./track_path",
-            "image_name": f"track_{frame:03d}.png",
+            "image_path": f"./track_path/track_{frame:03d}.png",
+            "image_name": f"track_{frame:03d}",
         }
 
         # 将当前帧的相机数据添加到列表

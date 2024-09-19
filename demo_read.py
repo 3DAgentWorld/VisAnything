@@ -7,6 +7,8 @@ def colmap_demo():
     colmap_path = 'colmap_cam_demo/garden'
     all_cams = read_colmap(colmap_path=colmap_path)
     print(f'read colmap cameras, number : {len(all_cams)}')
+    for cam in all_cams:
+        print(cam.image_path)
     all_cams.save_to_json(target_path=colmap_path)
 
 def waymo_demo():
